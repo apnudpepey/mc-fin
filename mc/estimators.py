@@ -13,6 +13,10 @@ def mc_estimate(samples, confidence=0.95):
     """
     x = np.asarray(samples, dtype=float) #turn arrays into numpy arrays
     n = len(x) #how many samples
+    if n < 2:
+        raise ValueError(f"At least two samples are required to compute an estimate, got {n}")
+    if not np.all(np.isfinite(x)):
+        raise ValueError("All samples must be finite numbers")
 
     mean = np.mean(x) #mean of the samples
     s = np.std(x, ddof=1) #sample standard deviation
