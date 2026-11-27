@@ -1,6 +1,12 @@
+from math import exp
+
 import numpy as np
 from mc.estimators import mc_estimate
+from mc.analytic import bs_call
+from mc.paths import gbm_terminal
+from mc.payoffs import call_payoff
 
+# ----------1.1.1----------
 rng = np.random.default_rng(42)  #random number generator with a fixed seed for reproducibility
 n=10000
 
@@ -33,3 +39,17 @@ print(result_pi)
 
 result_g = mc_estimate(g)
 print(result_g)
+
+#----------1.1.2----------
+S0, K, r, sigma, T = 100, 100, 0.05, 0.2, 1
+n_paths = 100000
+
+S_T = gbm_terminal(S0, r, sigma, T, n_paths, rng)
+C = exp(-r*T) * call_payoff(S_T, K)
+result = mc_estimate(C)
+exact = bs_call(S0, K, r, sigma, T)
+
+print("MC price:", result["mean"], "SE:", result["se"])
+print("95% CI:", result["ci_low"], "-", result["ci_high"])
+print("Black-Scholes price:", exact)
+print("BS inside CI?", result["ci_low"] < exact < result["ci_high"])
