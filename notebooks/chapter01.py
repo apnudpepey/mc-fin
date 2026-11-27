@@ -5,6 +5,8 @@ from mc.estimators import mc_estimate
 from mc.analytic import bs_call
 from mc.paths import gbm_terminal
 from mc.payoffs import call_payoff
+from mc.paths import gbm_paths
+from mc.payoffs import asian_call_payoff
 
 # ----------1.1.1----------
 rng = np.random.default_rng(42)  #random number generator with a fixed seed for reproducibility
@@ -53,3 +55,10 @@ print("MC price:", result["mean"], "SE:", result["se"])
 print("95% CI:", result["ci_low"], "-", result["ci_high"])
 print("Black-Scholes price:", exact)
 print("BS inside CI?", result["ci_low"] < exact < result["ci_high"])
+
+#----------1.1.2: asian----------
+m = 12  # number of time steps
+paths = gbm_paths(S0, r, sigma, T, m, n_paths, rng)
+C_asian = exp(-r*T) * asian_call_payoff(paths, K)
+result_asian = mc_estimate(C_asian)
+print("Asian MC price:", result_asian["mean"], "SE:", result_asian["se"])
